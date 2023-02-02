@@ -30,13 +30,13 @@ onMounted(async () =>
 })
 
 async function update (event: MouseEvent, restaurantId: string) {
-  console.log('update', event.currentTarget?.checked, restaurantId)
+  console.log('update', (event.currentTarget as HTMLInputElement).checked, restaurantId)
   if (!userStore.user) {
     return;
   }
-  userStore.updatePreference(event.currentTarget?.checked, {id: userStore.user?.id, restaurant: +restaurantId})
+  userStore.updatePreference((event.currentTarget as HTMLInputElement)?.checked, {id: userStore.user?.id, restaurant: +restaurantId})
 
-  if (event.currentTarget?.checked) {
+  if ((event.currentTarget as HTMLInputElement)?.checked) {
     const { error } = await supabase
       .from('preferences')
       .insert({ id: userStore.user.id, restaurant: restaurantId })

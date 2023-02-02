@@ -31,7 +31,7 @@
 import { ref } from "vue"
 import { supabase } from "../supabase"
 
-const redirectTo = import.meta.env.VITE_REDIRECT_TO
+const emailRedirectTo = import.meta.env.VITE_REDIRECT_TO
 const loading = ref(false)
 const email = ref("")
 const errorMessage = ref("")
@@ -43,10 +43,10 @@ const handleLogin = async () => {
     successMessage.value = ""
 
     loading.value = true
-    const { error } = await supabase.auth.signInWithOtp({ email: email.value, redirectTo })
+    const { error } = await supabase.auth.signInWithOtp({ email: email.value, options: { emailRedirectTo } })
     if (error) throw error
     successMessage.value = "Check your email for the login link!"
-  } catch (error) {
+  } catch (error: any) {
     errorMessage.value = error.error_description || error.message
   } finally {
     loading.value = false

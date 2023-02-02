@@ -15,9 +15,11 @@ app.use(router)
 
 const userStore = useUserStore()
 
-const { data: { user } } = await supabase.auth.getUser()
+//const { data: { user } } = await supabase.auth.getUser()
+supabase.auth.getUser().then(({ data: { user } }) => {
+  userStore.updateUser(user)
+  console.log(userStore.user)
+})
 
-userStore.updateUser(user)
-console.log(userStore.user)
 
 app.mount('#app')

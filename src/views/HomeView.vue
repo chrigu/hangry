@@ -5,7 +5,7 @@ import {useRestaurantsStore} from "@/stores/restaurants";
 import {ref} from "vue";
 
 const restaurantStore = useRestaurantsStore()
-const selectedRestaurant = ref(null)
+const selectedRestaurant = ref("")
 
 function selectRestaurant() {
   selectedRestaurant.value = restaurantStore

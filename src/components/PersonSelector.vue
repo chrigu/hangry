@@ -25,8 +25,8 @@ function isChecked (profileId: string) {
   return profileStore.selectedUsers.indexOf(profileId) > -1
 }
 
-function update (event, profileId: string) {
-  console.log('update', event.currentTarget.checked, profileId)
+function update (event: Event, profileId: string) {
+  console.log('update', (event.currentTarget as HTMLInputElement).checked, profileId)
   profileStore.updateSelectedUsers(profileId)
 }
 

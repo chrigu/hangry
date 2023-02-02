@@ -10,7 +10,7 @@ const router = useRouter()
 
 supabase.auth.onAuthStateChange(async (_, session) => {
   // eslint-disable-next-line no-prototype-builtins
-  if (userStore.user['email'] == undefined) {
+  if (userStore.user?.email == undefined) {
     const { data: { user } } = await supabase.auth.getUser()
     userStore.updateUser(user)
     router.push('/me')
