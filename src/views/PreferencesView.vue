@@ -8,6 +8,7 @@ import {getRestaurants} from "@/api";
 
 const userStore = useUserStore()
 const restaurantsStore = useRestaurantsStore()
+
 const {restaurants} = storeToRefs(restaurantsStore)
 
 onMounted(async () =>
@@ -57,7 +58,8 @@ function isChecked (id: number) {
 <template>
   <div>
    <div>
-     <h1>Where do you want to eat today?</h1>
+     <h1>Deine Restaurants</h1>
+     <p>Hallo {{userStore.user?.email}}, wähle deine bevorzugten Restaurtants aus:</p>
      <div>
       <form>
         <ul>

@@ -6,12 +6,18 @@ const userStore = useUserStore()
 function logout() {
   userStore.logout()
 }
+
 </script>
 
 <template>
   <header class="py-4 mb-8 px-4 shadow-md">
     <nav class="flex justify-between">
-      <h1>Power to the hangry people</h1>
+      <div class="flex">
+          <img
+            class="inline-block mr-2"
+            src="/iterativ.svg" />
+          <h1 class="text-sm font-medium">Power to the hangry people</h1>
+      </div>
       <RouterLink
         v-if="!userStore.user"
         to="/login">Login</RouterLink>
