@@ -5,6 +5,7 @@ import {useRestaurantsStore} from "@/stores/restaurants";
 import {ref, onMounted, reactive} from "vue";
 import {storeToRefs} from "pinia";
 import {getRestaurants} from "@/api";
+import Item from "@/components/Item.vue";
 
 const userStore = useUserStore()
 const restaurantsStore = useRestaurantsStore()
@@ -62,22 +63,24 @@ function isChecked (id: number) {
       <form>
         <ul>
           <li
+              class="mb-2"
               v-for="restaurant in restaurants"
               :key="restaurant.id">
-            <input
-                type="checkbox"
-                name="restaurant"
-                @click="update($event, restaurant.id)"
-                :checked="isChecked(+restaurant.id)"
-                :value="restaurant.id">
-            <label class="ml-2" :for="restaurant.id">{{restaurant.name}}</label>
-        </li>
+                <Item
+                    :selected="isChecked(+restaurant.id)"
+                    :msg="restaurant.name">
+                    <input
+                        type="checkbox"
+                        class="hidden"
+                        @click="update($event, restaurant.id)"
+                        :checked="isChecked(+restaurant.id)"
+                        :value="restaurant.id">
+                        <span>{{restaurant.name}}</span>
+                </Item>
+            </li>
         </ul>
       </form>
      </div>
-     <RouterLink
-      class="cursor-pointer"
-      to="/">Go eat</RouterLink> 
    </div>
   </div>
 </template>
