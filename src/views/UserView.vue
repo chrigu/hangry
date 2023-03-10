@@ -6,15 +6,15 @@ import {ref, onMounted, reactive} from "vue";
 import {storeToRefs} from "pinia";
 import {getRestaurants} from "@/api";
 import Item from "@/components/Item.vue";
+import type {Restaurant} from "@/types";
 
 const userStore = useUserStore()
 const restaurantsStore = useRestaurantsStore()
 const {restaurants} = storeToRefs(restaurantsStore)
+const selectedRestaurants = reactive([])
 
 onMounted(async () =>
 {
-  console.log('mounted')
-
   const getPreferences = async () => {
     const {data, error} = await supabase
         .from('preferences')
@@ -29,29 +29,11 @@ onMounted(async () =>
   getPreferences()
 })
 
-async function update (event: MouseEvent, restaurantId: string) {
-  console.log('update', (event.currentTarget as HTMLInputElement).checked, restaurantId)
-  if (!userStore.user) {
-    return;
-  }
-  userStore.updatePreference((event.currentTarget as HTMLInputElement)?.checked, {id: userStore.user?.id, restaurant: +restaurantId})
-
-  if ((event.currentTarget as HTMLInputElement)?.checked) {
-    const { error } = await supabase
-      .from('preferences')
-      .insert({ id: userStore.user.id, restaurant: restaurantId })
-  } else {
-    const { error } = await supabase
-        .from('preferences')
-        .delete()
-        .eq('id', userStore.user.id)
-        .eq('restaurant', restaurantId)
-  }
-}
 
 function isChecked (id: number) {
   return userStore.preferenceIds.indexOf(id) > -1
 }
+
 
 </script>
 
@@ -64,10 +46,10 @@ function isChecked (id: number) {
         <ul>
           <li
               class="mb-2"
-              v-for="restaurant in restaurants"
+              v-for="restaurant in restaurantsStore.preferedRestaurants"
               :key="restaurant.id">
                 <Item
-                    :selected="isChecked(+restaurant.id)"
+                    :selected="isChecked(restaurant.id)"
                     :msg="restaurant.name">
                     <input
                         type="checkbox"

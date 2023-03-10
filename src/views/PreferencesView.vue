@@ -5,10 +5,10 @@ import {useRestaurantsStore} from "@/stores/restaurants";
 import {ref, onMounted, reactive} from "vue";
 import {storeToRefs} from "pinia";
 import {getRestaurants} from "@/api";
+import Item from "@/components/Item.vue";
 
 const userStore = useUserStore()
 const restaurantsStore = useRestaurantsStore()
-
 const {restaurants} = storeToRefs(restaurantsStore)
 
 onMounted(async () =>
@@ -56,30 +56,31 @@ function isChecked (id: number) {
 </script>
 
 <template>
-  <div>
-   <div>
-     <h1>Deine Restaurants</h1>
-     <p>Hallo {{userStore.user?.email}}, wähle deine bevorzugten Restaurtants aus:</p>
-     <div>
-      <form>
-        <ul>
-          <li
-              v-for="restaurant in restaurants"
-              :key="restaurant.id">
-            <input
-                type="checkbox"
-                name="restaurant"
-                @click="update($event, restaurant.id)"
-                :checked="isChecked(+restaurant.id)"
-                :value="restaurant.id">
-            <label class="ml-2" :for="restaurant.id">{{restaurant.name}}</label>
-        </li>
-        </ul>
-      </form>
-     </div>
-     <RouterLink
-      class="cursor-pointer"
-      to="/">Go eat</RouterLink> 
-   </div>
-  </div>
+  <div class="flex justify-center">
+    <div>
+        <h1>Select your prefered restaurants</h1>
+        <div>
+            <form>
+              <ul>
+                <li
+                    class="mb-2"
+                    v-for="restaurant in restaurants"
+                    :key="restaurant.id">
+                      <Item
+                          :selected="isChecked(+restaurant.id)"
+                          :msg="restaurant.name">
+                          <input
+                              type="checkbox"
+                              class="hidden"
+                              @click="update($event, restaurant.id)"
+                              :checked="isChecked(+restaurant.id)"
+                              :value="restaurant.id">
+                              <span>{{restaurant.name}}</span>
+                      </Item>
+                  </li>
+              </ul>
+            </form>
+        </div>
+    </div>
+</div>
 </template>

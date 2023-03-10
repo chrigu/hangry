@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import {useProfilesStore} from "@/stores/profiles";
+import {useProfilesStore} from "@/stores/profiles"
+import { useUserStore } from './user'
 
 import type { Restaurant, Preference } from '@/types'
 
@@ -14,6 +15,10 @@ export const useRestaurantsStore = defineStore({
     preferences: <Preference[]>[]
   }),
   getters: {
+    preferedRestaurants (): Restaurant[] {
+      const userStore = useUserStore()
+      return this.restaurants.filter(restaurant => userStore.preferenceIds.indexOf(+restaurant.id) > -1)
+    },
     okRestaurants (): Restaurant[] {
       const profileStore = useProfilesStore()
       const numberSelectedUsers = profileStore.selectedUsers.length

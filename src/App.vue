@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import {useUserStore} from "@/stores/user"
+import {ref} from "vue"
+import Menu from "@/components/Menu.vue"
 
 const userStore = useUserStore()
+const showModal = ref(false)
 
 function logout() {
   userStore.logout()
@@ -10,7 +13,7 @@ function logout() {
 </script>
 
 <template>
-  <header class="py-4 mb-8 px-4 shadow-md">
+  <header class="py-4 mb-8 px-4">
     <nav class="flex justify-between">
       <div class="flex">
           <img
@@ -18,20 +21,25 @@ function logout() {
             src="/iterativ.svg" />
           <h1 class="text-sm font-medium">Power to the hangry people</h1>
       </div>
-      <RouterLink
-        v-if="!userStore.user"
-        to="/login">Login</RouterLink>
-      <div v-else>
-        <RouterLink
-          class="inline-block mr-4 cursor-pointer"
-          to="/me">Profile</RouterLink> 
-        <button class="inline-block cursor-pointer" @click="logout">Logout</button>
-      </div>
+      <button @click="showModal = true"><img
+        src="/menu.svg" />
+        </button>
     </nav>
   </header>
-  <div class="mx-16">
+  <div class="px-4">
     <RouterView />
   </div>
+    <Teleport to="body">
+      <div v-if="showModal"
+        class="absolute w-full h-full top-0 left-0 bg-white">
+        <div class="py-4 mb-8 px-4 inline-block text-right w-full">
+            <button @click="showModal = false">
+                <img src="/close.svg" />
+            </button>
+        </div>
+        <Menu />
+      </div>
+    </Teleport>
 </template>
 
 <style scoped>

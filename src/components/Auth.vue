@@ -1,3 +1,30 @@
+<script setup lang="ts">
+import { ref } from "vue"
+import { supabase } from "../supabase"
+
+const emailRedirectTo = import.meta.env.VITE_REDIRECT_TO
+const loading = ref(false)
+const email = ref("")
+const errorMessage = ref("")
+const successMessage = ref("")
+
+const handleLogin = async () => {
+  try {
+    errorMessage.value = ""
+    successMessage.value = ""
+
+    loading.value = true
+    const { error } = await supabase.auth.signInWithOtp({ email: email.value, options: { emailRedirectTo } })
+    if (error) throw error
+    successMessage.value = "Check your email for the login link!"
+  } catch (error: any) {
+    errorMessage.value = error.error_description || error.message
+  } finally {
+    loading.value = false
+  }
+}
+
+</script>
 <template>
   <form class="row flex flex-center" @submit.prevent="handleLogin">
     <div class="col-6 form-widget">
@@ -26,31 +53,3 @@
     <p class="success" v-if="successMessage">{{ successMessage }}</p>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from "vue"
-import { supabase } from "../supabase"
-
-const emailRedirectTo = import.meta.env.VITE_REDIRECT_TO
-const loading = ref(false)
-const email = ref("")
-const errorMessage = ref("")
-const successMessage = ref("")
-
-const handleLogin = async () => {
-  try {
-    errorMessage.value = ""
-    successMessage.value = ""
-
-    loading.value = true
-    const { error } = await supabase.auth.signInWithOtp({ email: email.value, options: { emailRedirectTo } })
-    if (error) throw error
-    successMessage.value = "Check your email for the login link!"
-  } catch (error: any) {
-    errorMessage.value = error.error_description || error.message
-  } finally {
-    loading.value = false
-  }
-}
-
-</script>
