@@ -11,27 +11,36 @@ import type {Restaurant} from "@/types";
 const userStore = useUserStore()
 const restaurantsStore = useRestaurantsStore()
 const {restaurants} = storeToRefs(restaurantsStore)
-const selectedRestaurants = reactive([])
+const selectedRestaurants = ref<number[]>([])
 
 onMounted(async () =>
 {
-  const getPreferences = async () => {
+  const getPreferences = async (userId: string) => {
     const {data, error} = await supabase
         .from('preferences')
         .select()
-        .eq('id', userStore.user?.id)
+        .eq('id', userId)
 
     userStore.updatePreferences(data || [])
   }
-
   const loadedRestaurants = await getRestaurants()
   restaurantsStore.updateRestaurants(loadedRestaurants || [])
-  getPreferences()
+  console.log(userStore.user?.id)
+  getPreferences(userStore.user?.id || 'some')
 })
 
 
 function isChecked (id: number) {
-  return userStore.preferenceIds.indexOf(id) > -1
+  return selectedRestaurants.value.includes(id)
+}
+
+function update (id: number) {
+  const index = selectedRestaurants.value.indexOf(id)
+  if (index > -1) {
+    selectedRestaurants.value.splice(index, 1) 
+  } else {
+    selectedRestaurants.value.push(id)
+  }
 }
 
 
@@ -54,7 +63,7 @@ function isChecked (id: number) {
                     <input
                         type="checkbox"
                         class="hidden"
-                        @click="update($event, restaurant.id)"
+                        @click="update(restaurant.id)"
                         :checked="isChecked(+restaurant.id)"
                         :value="restaurant.id">
                         <span>{{restaurant.name}}</span>
