@@ -75,7 +75,7 @@ function isChecked (id: number) {
                               @click="update($event, restaurant.id)"
                               :checked="isChecked(+restaurant.id)"
                               :value="restaurant.id">
-                              <span>{{restaurant.name}}</span>
+                              <span>{{restaurants.icon}} {{restaurant.name}}</span>
                       </Item>
                   </li>
               </ul>

@@ -2,19 +2,18 @@
 import {useUserStore} from "@/stores/user";
 import { supabase } from "../supabase"
 import {useRestaurantsStore} from "@/stores/restaurants";
-import {ref, onMounted, reactive} from "vue";
-import {storeToRefs} from "pinia";
-import {getRestaurants} from "@/api";
+import {ref, onMounted} from "vue";
+import {getRestaurants, bulkInsertChoices, getChoicesByUser} from "@/api";
 import Item from "@/components/Item.vue";
-import type {Restaurant} from "@/types";
 
 const userStore = useUserStore()
 const restaurantsStore = useRestaurantsStore()
-const {restaurants} = storeToRefs(restaurantsStore)
 const selectedRestaurants = ref<number[]>([])
+const choices = ref<any[]>([])
 
 onMounted(async () =>
 {
+  const { data: { user } } = await supabase.auth.getUser()
   const getPreferences = async (userId: string) => {
     const {data, error} = await supabase
         .from('preferences')
@@ -25,13 +24,20 @@ onMounted(async () =>
   }
   const loadedRestaurants = await getRestaurants()
   restaurantsStore.updateRestaurants(loadedRestaurants || [])
-  console.log(userStore.user?.id)
-  getPreferences(userStore.user?.id || 'some')
+
+  getPreferences(user?.id || 'some')
+  choices.value = await getChoicesByUser(user?.id || 'some')
+  console.log('choices', choices.value)
 })
 
 
 function isChecked (id: number) {
   return selectedRestaurants.value.includes(id)
+}
+
+function isSelected (id: number) {
+  console.log('choices', choices.value)
+  return choices.value.map(choice => choice.restaurant).includes(id)
 }
 
 function update (id: number) {
@@ -43,6 +49,10 @@ function update (id: number) {
   }
 }
 
+function save() {
+  bulkInsertChoices(userStore.user?.id, selectedRestaurants.value)
+}
+
 
 </script>
 
@@ -50,11 +60,12 @@ function update (id: number) {
   <div>
    <div>
      <h1>Where do you want to eat today?</h1>
-     <div>
-      <form>
+     <div v-if="choices.length == 0">
+      <form @submit.prevent="save()">
         <ul>
           <li
               class="mb-2"
+              v-if="choices.length == 0"
               v-for="restaurant in restaurantsStore.preferedRestaurants"
               :key="restaurant.id">
                 <Item
@@ -66,11 +77,28 @@ function update (id: number) {
                         @click="update(restaurant.id)"
                         :checked="isChecked(+restaurant.id)"
                         :value="restaurant.id">
-                        <span>{{restaurant.name}}</span>
+                        <span>{{restaurant.icon}} {{restaurant.name}}</span>
                 </Item>
             </li>
         </ul>
+        <button class="bg-green rounded-lg">Save</button>
       </form>
+     </div>
+     <div v-else>
+      <p>You have already voted. Your votes:</p>
+      <ul>
+          <li
+              class="mb-2"
+              v-for="restaurant in restaurantsStore.preferedRestaurants"
+              :key="restaurant.id">
+                <Item
+                  v-if="isSelected(restaurant.id)"
+                    :selected="isChecked(restaurant.id)"
+                    :msg="restaurant.name">
+                      <span>{{restaurant.icon}} {{restaurant.name}}</span>
+                </Item>
+            </li>
+        </ul>
      </div>
    </div>
   </div>

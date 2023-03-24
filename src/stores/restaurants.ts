@@ -2,17 +2,20 @@ import { defineStore } from 'pinia'
 import {useProfilesStore} from "@/stores/profiles"
 import { useUserStore } from './user'
 
-import type { Restaurant, Preference } from '@/types'
+import type { Restaurant, RestaurantWithCount, Preference } from '@/types'
 
 interface RestaurantCount {
   [key: string]: number
 }
 
+
+
 export const useRestaurantsStore = defineStore({
   id: 'restaurants',
   state: () => ({
     restaurants: <Restaurant[]>[],
-    preferences: <Preference[]>[]
+    preferences: <Preference[]>[],
+    choices: <Preference[]>[]
   }),
   getters: {
     preferedRestaurants (): Restaurant[] {
@@ -46,11 +49,33 @@ export const useRestaurantsStore = defineStore({
       }
 
       return this.restaurants.filter(restaurant => okRestaurants.indexOf(restaurant.id.toString()) > -1)
+    },
+    restaurantChoices (): RestaurantWithCount[] {
+      console.log(this.choices, this.restaurants)
+      // make sum of choices
+      const choices = this.choices.reduce((choices, choice: Preference) => {
+        if (choices[choice.restaurant] === undefined) {
+          choices[choice.restaurant] = 0
+        }
+        choices[choice.restaurant] = choices[choice.restaurant] + 1
+        return choices
+      }, {})
+      
+      const restaurantChoices = this.restaurants.map(restaurant => {
+        const count = choices[restaurant.id] === undefined ? 0 : choices[restaurant.id]
+        return Object.assign(restaurant, {count})
+      })
+      .sort((a, b) => b.count - a.count)
+      .filter(restaurant => restaurant.count > 0)
+      return restaurantChoices
     }
   },
   actions: {
     updateRestaurants (restaurants: Restaurant[]) {
       this.restaurants = restaurants
     },
+    updateChoices (choices: Preference[]) {
+        this.choices = choices
+    }
   }
 })

@@ -10,5 +10,10 @@ export interface Preference {
 
 export interface Restaurant {
   id: string;
+  icon: string;
   name: string;
+}
+
+export interface RestaurantWithCount extends Restaurant {
+  count: number
 }

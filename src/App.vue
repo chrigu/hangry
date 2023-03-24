@@ -3,12 +3,7 @@ import {useUserStore} from "@/stores/user"
 import {ref} from "vue"
 import Menu from "@/components/Menu.vue"
 
-const userStore = useUserStore()
 const showModal = ref(false)
-
-function logout() {
-  userStore.logout()
-}
 
 </script>
 
@@ -37,7 +32,7 @@ function logout() {
                 <img src="/close.svg" />
             </button>
         </div>
-        <Menu />
+        <Menu @click="showModal = false" />
       </div>
     </Teleport>
 </template>
