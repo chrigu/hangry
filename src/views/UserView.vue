@@ -9,7 +9,6 @@ import Item from "@/components/Item.vue";
 const userStore = useUserStore()
 const restaurantsStore = useRestaurantsStore()
 const selectedRestaurants = ref<number[]>([])
-const choices = ref<any[]>([])
 
 onMounted(async () =>
 {
@@ -26,8 +25,7 @@ onMounted(async () =>
   restaurantsStore.updateRestaurants(loadedRestaurants || [])
 
   getPreferences(user?.id || 'some')
-  choices.value = await getChoicesByUser(user?.id || 'some')
-  console.log('choices', choices.value)
+  await restaurantsStore.getChoicesForUser()
 })
 
 
@@ -36,8 +34,7 @@ function isChecked (id: number) {
 }
 
 function isSelected (id: number) {
-  console.log('choices', choices.value)
-  return choices.value.map(choice => choice.restaurant).includes(id)
+  return restaurantsStore.choices.map(choice => choice.restaurant).includes(id)
 }
 
 function update (id: number) {
@@ -51,6 +48,7 @@ function update (id: number) {
 
 function save() {
   bulkInsertChoices(userStore.user?.id, selectedRestaurants.value)
+
 }
 
 
@@ -60,12 +58,12 @@ function save() {
   <div>
    <div>
      <h1>Where do you want to eat today?</h1>
-     <div v-if="choices.length == 0">
+     <div v-if="restaurantsStore.choices.length == 0">
       <form @submit.prevent="save()">
         <ul>
           <li
               class="mb-2"
-              v-if="choices.length == 0"
+              v-if="restaurantsStore.choices.length == 0"
               v-for="restaurant in restaurantsStore.preferedRestaurants"
               :key="restaurant.id">
                 <Item
