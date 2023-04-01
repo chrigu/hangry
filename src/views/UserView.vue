@@ -4,6 +4,7 @@ import { supabase } from "../supabase"
 import {useRestaurantsStore} from "@/stores/restaurants";
 import {ref, onMounted} from "vue";
 import {getRestaurants, bulkInsertChoices, getChoicesByUser} from "@/api";
+import RestaurantList from "@/components/RestaurantList.vue";
 import Item from "@/components/Item.vue";
 
 const userStore = useUserStore()
@@ -60,25 +61,11 @@ function save() {
      <h1>Where do you want to eat today?</h1>
      <div v-if="restaurantsStore.choices.length == 0">
       <form @submit.prevent="save()">
-        <ul>
-          <li
-              class="mb-2"
-              v-if="restaurantsStore.choices.length == 0"
-              v-for="restaurant in restaurantsStore.preferedRestaurants"
-              :key="restaurant.id">
-                <Item
-                    :selected="isChecked(restaurant.id)"
-                    :msg="restaurant.name">
-                    <input
-                        type="checkbox"
-                        class="hidden"
-                        @click="update(restaurant.id)"
-                        :checked="isChecked(+restaurant.id)"
-                        :value="restaurant.id">
-                        <span>{{restaurant.icon}} {{restaurant.name}}</span>
-                </Item>
-            </li>
-        </ul>
+        <RestaurantList
+            :choices="restaurantsStore.choices"
+            :preferedRestaurants="restaurantsStore.preferedRestaurants"
+            :selectedRestaurants="selectedRestaurants"
+            @update="update" />
         <button class="bg-green rounded-lg">Save</button>
       </form>
      </div>

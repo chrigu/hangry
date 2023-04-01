@@ -1,27 +1,40 @@
 <script setup lang="ts">
 
-import {onMounted} from "vue";
-import {getRestaurants, getProfiles, getPreferences} from "@/api";
-import {useRestaurantsStore} from "@/stores/restaurants";
+import type { Preference, Restaurant } from "@/types";
+import Item from "@/components/Item.vue";
 
-const restaurantStore = useRestaurantsStore()
+const props = defineProps<{
+  choices: Preference[],
+  preferedRestaurants: Restaurant[],
+  selectedRestaurants: number[],
+}>()
 
-onMounted(async () =>
-{
-  console.log('mounted')
+const emit = defineEmits(['update'])
 
-  const profiles = await getProfiles()
-  const preferences = await getPreferences()
-  const restaurants = await getRestaurants()
-})
-
+function isChecked (id: number) {
+  return props.selectedRestaurants.includes(id)
+}
 
 </script>
 
 <template>
-  <div>
-    <ul>
-      <li v-for="restaurant in restaurantStore.okRestaurants" :key="restaurant.id">{{restaurant.name}}</li>
-    </ul>
-  </div>
+  <ul>
+    <li
+        class="mb-2"
+        v-if="choices.length == 0"
+        v-for="restaurant in preferedRestaurants"
+        :key="restaurant.id">
+          <Item
+              :selected="isChecked(+restaurant.id)"
+              :msg="restaurant.name">
+              <input
+                  type="checkbox"
+                  class="hidden"
+                  @click="emit('update', restaurant.id)"
+                  :checked="isChecked(+restaurant.id)"
+                  :value="restaurant.id">
+                  <span>{{restaurant.icon}} {{restaurant.name}}</span>
+          </Item>
+      </li>
+  </ul>
 </template>
